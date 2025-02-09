@@ -12,7 +12,7 @@ app = Flask(__name__)
 # استخدام متغير البيئة لتحديد URI لقاعدة البيانات PostgreSQL من Render
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'mysecretkey')  # تأكد من تعيين سر للمصادقة
+
 
 # إعداد قاعدة البيانات
 db = SQLAlchemy(app)
