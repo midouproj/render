@@ -1,7 +1,7 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-import os
 
 # إعداد التطبيق و قاعدة البيانات
 app = Flask(__name__)
@@ -89,4 +89,6 @@ def services():
     return render_template('services.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # ربط التطبيق مع المنفذ الذي يتم تحديده عبر Render
+    port = int(os.environ.get("PORT", 5000))  # استخدام المنفذ الذي يحدده Render
+    app.run(host="0.0.0.0", port=port, debug=True)
