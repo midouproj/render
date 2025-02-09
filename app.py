@@ -1,10 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
-from dotenv import load_dotenv
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
-
-# تحميل المتغيرات البيئية من الملف .env أو من Secrets في Replit
-load_dotenv()
 
 # إعداد التطبيق و قاعدة البيانات
 app = Flask(__name__)
@@ -13,6 +10,8 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# إضافة مفتاح سري لتأمين الجلسات
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_default_secret_key')
 
 # إعداد قاعدة البيانات
 db = SQLAlchemy(app)
@@ -43,7 +42,7 @@ def login():
         # البحث عن المستخدم في قاعدة البيانات
         user = User.query.filter_by(username=username).first()
 
-        if user and user.password == password:
+        if user and check_password_hash(user.password, password):  # التحقق من كلمة المرور باستخدام check_password_hash
             session['user_id'] = user.id  # تخزين ID المستخدم في الجلسة
             return redirect(url_for('services'))  # إعادة التوجيه إلى صفحة الخدمات
         else:
@@ -66,7 +65,10 @@ def register():
             flash('البريد الإلكتروني موجود بالفعل', 'danger')
             return redirect(url_for('register'))
 
-        new_user = User(username=username, email=email, password=password)
+        # تشفير كلمة المرور
+        password_hash = generate_password_hash(password)
+
+        new_user = User(username=username, email=email, password=password_hash)
 
         # إضافة المستخدم إلى قاعدة البيانات
         db.session.add(new_user)
